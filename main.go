@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	pingpong "github.com/percybolmer/grpcexample/pingpong"
+	"github.com/percybolmer/grpcexample/pingpong"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -24,8 +24,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// We need to tell the code WHAT TO do on each request, ie. The business logic.
-	// In GRPC cases, the Server is acutally just an Interface
+	// We need to tell the code WHAT TO do on each request, i.e. The business logic.
+	// In GRPC cases, the Server is actually just an Interface
 	// So we need a struct which fulfills the server interface
 	// see server.go
 	s := &Server{}
@@ -34,11 +34,12 @@ func main() {
 	pingpong.RegisterPingPongServer(apiserver, s)
 	// Start serving in a goroutine to not block
 	go func() {
+		log.Printf("starting grpc server on %s", lis.Addr().String())
 		log.Fatal(apiserver.Serve(lis))
 	}()
 	// Wrap the GRPC Server in grpc-web and also host the UI
 	grpcWebServer := grpcweb.WrapServer(apiserver)
-	// Lets put the wrapped grpc server in our multiplexer struct so
+	// Let's put the wrapped grpc server in our multiplexer struct,so
 	// it can reach the grpc server in its handler
 	multiplex := grpcMultiplexer{
 		grpcWebServer,
@@ -46,19 +47,20 @@ func main() {
 
 	// We need a http router
 	r := http.NewServeMux()
-	// Load the static webpage with a http fileserver
+	// Load the static webpage with a http file server
 	webapp := http.FileServer(http.Dir("ui/pingpongapp/build"))
 	// Host the Web Application at /, and wrap it in the GRPC Multiplexer
 	// This allows grpc requests to transfer over HTTP1. then be
 	// routed by the multiplexer
 	r.Handle("/", multiplex.Handler(webapp))
-	// Create a HTTP server and bind the router to it, and set wanted address
+	// Create an HTTP server and bind the router to it, and set wanted address
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         "localhost:8080",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
+	log.Printf("starting server on %s", srv.Addr)
 	// Serve the webapp over TLS
 	log.Fatal(srv.ListenAndServeTLS("cert/server.crt", "cert/server.key"))
 

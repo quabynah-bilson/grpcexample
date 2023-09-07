@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	pingpong "github.com/percybolmer/grpcexample/pingpong"
+	"github.com/percybolmer/grpcexample/pingpong"
 )
 
 // Server is the Logic handler for the server

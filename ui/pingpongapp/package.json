@@ -23,9 +23,10 @@
     "extends": [
       "react-app",
       "react-app/jest"
-      
     ],
-    "ignorePatterns": ["**/*_pb.js"]
+    "ignorePatterns": [
+      "**/*_pb.js"
+    ]
   },
   "browserslist": {
     "production": [

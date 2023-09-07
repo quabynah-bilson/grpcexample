@@ -35,7 +35,7 @@ func main() {
 
 // loadTLSCfg will load a certificate and create a tls config
 func loadTLSCfg() *tls.Config {
-	b, _ := ioutil.ReadFile("../cert/server.crt")
+	b, _ := ioutil.ReadFile("cert/server.crt")
 	cp := x509.NewCertPool()
 	if !cp.AppendCertsFromPEM(b) {
 		log.Fatal("credentials: failed to append certificates")
